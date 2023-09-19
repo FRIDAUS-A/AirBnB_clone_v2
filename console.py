@@ -59,12 +59,6 @@ class HBNBCommand(cmd.Cmd):
             tmp_list.pop(0)
             tmp_list.insert(1, name)
             line = " ".join(tmp_list)
-        """
-        elif match and index == 5:
-            tmp_list = list(match.groups())
-            print(tmp_list)
-            line = " ".join(tmp_list)
-        """
         return cmd.Cmd.precmd(self, line)
 
     def do_create(self, line):
@@ -235,6 +229,10 @@ class HBNBCommand(cmd.Cmd):
 
     def emptyline(self):
         """Defines what happens when a line is empty"""
+        pass
+
+    def default(self, *args):
+        """defines what happen whwn the command is not recognized"""
         pass
 
     def do_count(self, line):
