@@ -76,7 +76,7 @@ class FileStorage():
                 content = file.read()
                 content = json.loads(content)
                 for key, value in content.items():
-                    FileStorage.__objects[key] = self.classes()
+                    FileStorage.__objects[key] = self.classes()\
                     [value["__class__"]](**value)
         except FileNotFoundError:
             return
@@ -92,3 +92,4 @@ class FileStorage():
                     break
             for key, value in content.items():
                 self.new(value)
+            return
