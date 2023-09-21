@@ -4,11 +4,18 @@ OTHER CLASSES
 """
 import uuid
 from datetime import datetime
-from models import storage
+from sqlalchemy import Column, String, DateTime
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
 
 
 class BaseModel:
     """THE BaseModel CLASS"""
+
+    id = Column(String(60), primary_key=True, nullable=False)
+    created_at = Column(DateTime, nullable=False, default=datetime.utcnow())
+    updated_at = Column(DateTime, nullable=False, default=datetime.utcnow())
 
     def __init__(self, *args, **kwargs):
         """INSTANCE CONSTRUCTOR
@@ -22,7 +29,6 @@ class BaseModel:
             self.id = str(uuid.uuid4())
             self.created_at = datetime.now()
             self.updated_at = datetime.now()
-            storage.new(self)
 
         else:
             for key, value in kwargs.items():
@@ -32,14 +38,18 @@ class BaseModel:
                         date, time = result.split('T')
                         year, month, day = date.split('-')
                         hour, minute, second = time.split(':')
-                        main_sec, microsec = second.split('.')
+                        if '.' in second:
+                            main_sec, microsec = second.split('.')
+                        else:
+                            main_sec = second
+                            microsec = 0
                         self.__dict__[key] = datetime(
                                 int(year), int(month), int(day),
                                 int(hour), int(minute), int(main_sec),
                                 int(microsec)
                                 )
                     else:
-                        self.__dict__[key] = value
+                        setattr(self, key, value)
 
     def __str__(self):
         """string representation of an object"""
@@ -49,7 +59,9 @@ class BaseModel:
         """updates the public instance attribute
         updated_at with the current datetime
         """
+        from models import storage
         self.updated_at = datetime.now()
+        storage.new(self)
         storage.save()
 
     def to_dict(self):
@@ -63,8 +75,16 @@ class BaseModel:
         instance = self.__dict__
         dic = {}
         for key, value in instance.items():
-            dic[key] = value
+            if key != '_sa_instance_state':
+                dic[key] = value
         dic["__class__"] = self.__class__.__name__
         self.created_at = tmp_created
         self.updated_at = tmp_updated
         return dic
+
+    def delete(self):
+        """delete object"""
+        from models import storage
+        storage.delete(self)
+        storage.save()
+        storage.close()
