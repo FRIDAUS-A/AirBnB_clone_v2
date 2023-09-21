@@ -81,9 +81,7 @@ class HBNBCommand(cmd.Cmd):
                 line.insert(1, obj.id)
             for mem in attr:
                 mem = mem.split('=')
-                parse = line + mem
-                parse = " ".join(parse)
-                self.do_update(parse)
+                setattr(obj, mem[0], mem[1][1:-1])
         elif line[0] not in classes:
             print("** class doesn't exist **")
             return
@@ -211,17 +209,16 @@ class HBNBCommand(cmd.Cmd):
         else:
             for key, value in content.items():
                 if arg[1] == value.to_dict()["id"]:
-                    kwargs = value.to_dict()
+                    obj = value
                     tmp = arg[3]
                     if (tmp[0] == "\"" or tmp[0] == "\'"):
-                        kwargs[arg[2]] = tmp[1:-1]
+                        setattr(obj, arg[2], tmp[1:-1])
                     else:
                         if (float(tmp) - int(float(tmp))) == 0:
-                            kwargs[arg[2]] = int(tmp)
+                            setattr(obj, arg[2], int(tmp))
                         else:
-                            kwargs[arg[2]] = float(tmp)
-                    content[key] = classes[arg[0]](**kwargs)
-            storage.save()
+                            setattr(obj, arg[2], float(tmp))
+            obj.save()
 
     def do_EOF(self, line):
         """quit with ctrl-D is presswd"""
