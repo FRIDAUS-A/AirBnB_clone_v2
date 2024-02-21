@@ -35,7 +35,7 @@ class DBStorage:
         if cls:
             query = self.__session.query(cls)
             for obj in query:
-                key = f"{obj.clasa.__name__}.{obj.id}"
+                key = f"{obj.__class__.__name__}.{obj.id}"
                 dic[key] = obj
         else:
             classes = [State, City]
