@@ -5,7 +5,6 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.base_model import Base
 
-
 class DBStorage:
     """db storage"""
     __engine = None
@@ -31,6 +30,10 @@ class DBStorage:
         from models.place import Place
         from models.review import Review
         from models.amenity import Amenity
+        classes = {
+                "State": State, "City": City, "Amenity": Amenity,
+                "Place": Place, "Review": Review, "User": User
+                    }
         dic = {}
         if cls:
             query = self.__session.query(cls)
@@ -38,13 +41,20 @@ class DBStorage:
                 key = f"{obj.__class__.__name__}.{obj.id}"
                 dic[key] = obj
         else:
-            classes = [State, City]
-            for cl in classes:
+            for cl in classes.values():
                 query = self.__session.query(cl).all()
                 for obj in query:
                     key = f"{obj.__class__.__name__}.{obj.id}"
                     dic[key] = obj
         return dic
+
+    
+    def get(self, cls, obj_id):
+        obj = self.__session.query(cls).get(obj_id)
+        if obj:
+            return obj
+        else:
+            return None
 
     def new(self, obj):
         """add the object to the current database session"""
@@ -75,5 +85,4 @@ class DBStorage:
     def close(self):
         """close a session"""
         #self.__session.remove()
-        print(self.__session)
         self.__session.close()

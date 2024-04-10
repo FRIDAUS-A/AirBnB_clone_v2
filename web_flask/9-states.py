@@ -16,11 +16,16 @@ def teardown(exception):
     storage.close()
 
 
-@app.route("/cities_by_states", strict_slashes=False)
-def cities_by_states():
+@app.route("/states", strict_slashes=False)
+@app.route("/states/<state_id>", strict_slashes=False)
+def cities_by_states(state_id=None):
     """renders cities by states"""
-    states = storage.all(State).values()
-    return render_template("8-states_list.html", states=states)
+    if not state_id:
+        states = storage.all(State).values()
+        return render_template("9-states.html", states=states)
+    else:
+        state = storage.get(State, state_id)
+        return render_template("9-states.html", state=state)
 
 
 if __name__ == '__main__':
