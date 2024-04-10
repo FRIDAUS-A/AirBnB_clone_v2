@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from os import environ
 
-if 'HBNB_TYPE_STORAGE' in environ and environ['HBNB_TYPE_STORAGE'] == 'db':
+storage_t = environ['HBNB_TYPE_STORAGE']
+if 'HBNB_TYPE_STORAGE' in environ and storage_t == 'db':
     from models.engine.db_storage import DBStorage
     storage = DBStorage()
 else:
